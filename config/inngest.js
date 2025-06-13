@@ -38,7 +38,8 @@ export const syncUserUpdation = inngest.createFunction(
         const userData = {
             _id:id,
             email: email_addresses[0].email_address,
-            name: first_name + ' ' + last_name, 
+            name: first_name + ' ' + last_name,
+            cartItems: {}, 
             imageUrl:image_url
         }
         await connectDB()
