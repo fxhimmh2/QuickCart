@@ -1,7 +1,6 @@
 import { Inngest } from "inngest";
 import connectDB from "./db";
 import User from "@/models/User";
-import { hashEventKey } from "inngest/helpers/strings";
 import Order from "@/models/Order";
 
 // Create a client to send and receive events
