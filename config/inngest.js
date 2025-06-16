@@ -1,12 +1,13 @@
 import { Inngest } from "inngest";
 import connectDB from "./db";
 import User from "@/models/User";
+import { hashEventKey } from "inngest/helpers/strings";
+import Order from "@/models/Order";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "project-next" });
 
 // Inngest function to save user data to a database 
-
 export const syncUserCreation = inngest.createFunction(
     {
         id: 'sync-user-from-clerk'
@@ -27,7 +28,6 @@ export const syncUserCreation = inngest.createFunction(
 )
 
 // Inngest function to update user data in the database
-
 export const syncUserUpdation = inngest.createFunction(
     {
         id: 'update-user-from-clerk'
@@ -47,7 +47,6 @@ export const syncUserUpdation = inngest.createFunction(
 )
 
 // Inngest function to delete user from the database 
-
 export const syncUserDeletion = inngest.createFunction(
     {
         id: 'delete-user-with-clerk'
@@ -58,5 +57,35 @@ export const syncUserDeletion = inngest.createFunction(
 
         await connectDB()
         await User.findByIdAndDelete(id)
+    }
+)
+
+// Inngest function to create user's order in database 
+export const createUserOrder = inngest.createFunction(
+    {
+        id:'create-user-order',
+        batchEvents: {
+            maxSize: 25,
+            timeout: '5s'
+        }
+    },
+    {event: 'order/created'},
+    async({events}) => {
+
+        const orders = events.map((event) => {
+            return {
+                userId: event.data.userId,
+                items: event.data.items,
+                amount: event.data.amount,
+                address: event.data.address,
+                date : event.data.date
+            }
+        })
+
+        await connectDB()
+        await Order.insertMany(orders)
+
+        return { success: true, processed: orders.length };
+
     }
 )
