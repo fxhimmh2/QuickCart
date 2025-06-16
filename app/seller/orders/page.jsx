@@ -21,7 +21,7 @@ const Orders = () => {
             const token = await getToken()
 
             const {data} = await axios.get(
-                '/api/order/seller-orders',
+                '/api/order/seller-order',
                 {headers:{Authorization:`Bearer ${token}`}}
             )
 
